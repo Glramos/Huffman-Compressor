@@ -20,7 +20,7 @@ public class Compressor {
 		String option = "-c";
 		
 		// get one path to the file to be compressed or decompressed
-		Path path = Paths.get("C:\\Users\\Gabriel Ramos\\Desktop\\texttest2.txt");
+		Path path = Paths.get("C:\\Users\\Gabriel Ramos\\Desktop\\texttest.txt");
 		
 		if (option.equals("-c"))
 			encode(path);
@@ -130,7 +130,11 @@ public class Compressor {
 		    
 		}
 		
-		String rawData = "";
+		String header = makeHeader(dictionary);
+		
+		System.out.println(header);
+		
+		String rawData = header;
 		
 		// codificates data into a string just for visualization
 		for (Byte b : data) {
@@ -143,6 +147,36 @@ public class Compressor {
 		System.exit(0);
 	}
 	
+	private static String makeHeader(Map<Byte, String> dictionary) {
+		// TODO Auto-generated method stub
+		String header = "";
+		
+		// the header compositon with 1 + x bytes:
+		/*
+		 *  Length of the header [1 byte]
+		 *  Dictionary [x bytes]
+		 */
+		
+		// The dictionary composition for each word is:
+		/*
+		 * Word [1 byte]
+		 * Lenght of the Code [1 byte]
+		 * Code [length]
+		 */
+		for (Map.Entry<Byte, String> entry : dictionary.entrySet()) {			
+			String word = String.format("%8s", Integer.toBinaryString(entry.getKey() & 0xFF)).replace(' ', '0');
+			String codeLenght = String.format("%8s", Integer.toBinaryString(entry.getValue().length() & 0xFF)).replace(' ', '0');
+			
+			header = header + word + codeLenght + entry.getValue();
+		    
+		}
+		
+		// Calculates and informs the lenght of the header
+		header = String.format("%8s", Integer.toBinaryString(header.length() & 0xFF)).replace(' ', '0') + header;
+		
+		return header;
+	}
+
 	private static void decode(Path path) {
 		// TODO Auto-generated method stub
 		
